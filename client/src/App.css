@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+.titleField,
+.dateField,
+.todoBtn {
+  margin-top: 15px !important;
+}
