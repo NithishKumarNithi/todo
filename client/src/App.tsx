@@ -7,6 +7,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Checkbox from "@mui/material/Checkbox";
 import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
 import React, { useState } from "react";
 
 interface Item {
@@ -24,6 +25,20 @@ function App() {
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setTitle(e.target.value);
+  }
+
+  async function handleDelete(id: number): Promise<void> {
+    let res = await fetch(`http://localhost:7005/todos/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      console.error("Request failed");
+    }
+    let data = await res.json();
+    console.log(data);
   }
 
   async function handleClick(): Promise<void> {
@@ -89,6 +104,13 @@ function App() {
               <Checkbox checked={item.isChecked} />
               Title : {item.title}
               Date : {item.date}
+              <Stack direction="row" spacing={2}>
+                {/* <Button onClick={handleEdit(item.id)}>Edit</Button>
+                <Button onClick={handleUpdate(item.id)}>Update</Button> */}
+                <Button onClick={() => handleDelete(item.id as number)}>
+                  Delete
+                </Button>
+              </Stack>
             </li>
           ))}
         </ul>
