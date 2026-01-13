@@ -7,3 +7,19 @@
 body {
   margin: 0;
 }
+
+completed {
+  background-color: #4caf50;
+}
+
+overdue {
+  background-color: #ff4569;
+}
+
+dueToday {
+  background-color: #ffef62;
+}
+
+upcoming {
+  background-color: #d3d3d3;
+}

@@ -19,7 +19,7 @@ interface Item {
 
 function App() {
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState<Dayjs | null>(dayjs("04/11/2024"));
+  const [date, setDate] = useState<Dayjs | null>(dayjs(" "));
   const [alertMsg, setAlertMsg] = useState("");
   const [itemList, setItemList] = useState<Item[]>([]);
   const [isEdit, setIsEdit] = useState<Item | null>(null);
@@ -77,7 +77,7 @@ function App() {
   }
 
   async function handleClick(): Promise<void> {
-    let _date = date?.format("DD/MM/YYYY");
+    let _date = date?.format("MM/DD/YYYY");
     let body = { title: title, date: _date };
     let res = await fetch("http://localhost:7005/todos", {
       method: "POST",
@@ -98,7 +98,7 @@ function App() {
   }
 
   async function handleUpdate(): Promise<void> {
-    let _date = date?.format("DD/MM/YYYY");
+    let _date = date?.format("MM/DD/YYYY");
     let body = { id: isEdit?.id, title: title, date: _date };
     let res = await fetch("http://localhost:7005/todos", {
       method: "PUT",
@@ -141,7 +141,7 @@ function App() {
           <DateField
             label="Date"
             className="dateField"
-            format="DD/MM/YYYY"
+            format="MM/DD/YYYY"
             value={date}
             onChange={(val) => setDate(val)}
           />
