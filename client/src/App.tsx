@@ -146,8 +146,8 @@ function App() {
                 checked={item.isChecked}
                 onClick={() => handleCheckbox(item.id as number)}
               />
-              Title : {item.title}
-              Date : {item.date}
+              <span className="me-4">Title : {item.title} </span>
+              <span>Date : {item.date}</span>
               <Stack direction="row" spacing={2}>
                 <Button onClick={() => handleEdit(item)}>Edit</Button>
                 <Button onClick={() => handleDelete(item.id as number)}>
