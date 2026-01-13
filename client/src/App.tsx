@@ -17,10 +17,28 @@ interface Item {
   isChecked?: boolean;
 }
 
+type AlertStatus = "success" | "error"
+
+function checkTaskStatus(item: Item) : string {
+  let currentDate = new Date().getTime();
+  let dueDate = new Date(item.date as string).getTime();
+
+  if(item.isChecked) return "completed";
+
+  if(dueDate < currentDate) return "overdue";
+
+  if(dueDate == currentDate) return "dueToday";
+
+  return "upcoming";
+}
+
+const API_ENDPOINT: string = "http://localhost:7005"
+
 function App() {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState<Dayjs | null>(dayjs(" "));
-  const [alertMsg, setAlertMsg] = useState("");
+  const [alertMsg, setAlertMsg] = useState<string>("");
+  const [alertStatus, setAlertStatus] = useState<AlertStatus>("success")
   const [itemList, setItemList] = useState<Item[]>([]);
   const [isEdit, setIsEdit] = useState<Item | null>(null);
 
@@ -37,7 +55,7 @@ function App() {
   }
 
   async function handleCheckbox(id: number) {
-    let res = await fetch(`http://localhost:7005/todos/${id}/complete`, {
+    let res = await fetch(`${API_ENDPOINT}/todos/${id}/complete`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -52,7 +70,7 @@ function App() {
   }
 
   async function handleDelete(id: number): Promise<void> {
-    let res = await fetch(`http://localhost:7005/todos/${id}`, {
+    let res = await fetch(`${API_ENDPOINT}/todos/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +85,7 @@ function App() {
   }
 
   async function fetchLists() {
-    let res = await fetch("http://localhost:7005");
+    let res = await fetch(`${API_ENDPOINT}`);
     if (!res.ok) {
       console.error("Request failed");
     }
@@ -79,7 +97,7 @@ function App() {
   async function handleClick(): Promise<void> {
     let _date = date?.format("MM/DD/YYYY");
     let body = { title: title, date: _date };
-    let res = await fetch("http://localhost:7005/todos", {
+    let res = await fetch(`${API_ENDPOINT}/todos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,6 +133,7 @@ function App() {
     let data = await res.json();
 
     setAlertMsg(data.message);
+    setAlertStatus(data.status);
     await fetchLists();
   }
 
@@ -125,7 +144,7 @@ function App() {
       </h1>
       <div className="w-full flex flex-col justify-between my-8 px-4">
         {alertMsg && (
-          <Alert variant="filled" severity="success">
+          <Alert variant="filled" severity={alertStatus}>
             {alertMsg}
           </Alert>
         )}
@@ -167,7 +186,7 @@ function App() {
       {itemList.length > 0 && (
         <ul>
           {itemList.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className={checkTaskStatus(item)}>
               <Checkbox
                 checked={item.isChecked}
                 onClick={() => handleCheckbox(item.id as number)}
