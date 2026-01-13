@@ -8,18 +8,18 @@ body {
   margin: 0;
 }
 
-completed {
+.completed {
   background-color: #4caf50;
 }
 
-overdue {
+.overdue {
   background-color: #ff4569;
 }
 
-dueToday {
+.dueToday {
   background-color: #ffef62;
 }
 
-upcoming {
+.upcoming {
   background-color: #d3d3d3;
 }
