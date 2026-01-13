@@ -19,12 +19,36 @@ interface Item {
 
 function App() {
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState<Dayjs | null>(dayjs("2022-04-17"));
+  const [date, setDate] = useState<Dayjs | null>(dayjs(""));
   const [alertMsg, setAlertMsg] = useState("");
   const [itemList, setItemList] = useState<Item[]>([]);
+  const [isEdit, setIsEdit] = useState<Item | null>(null);
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setTitle(e.target.value);
+  }
+
+  function handleEdit(data: Item) {
+    setIsEdit(data);
+    let item = itemList.find((item) => item.id === data.id);
+    console.log(item);
+    setTitle(data.title);
+    setDate(dayjs(data.date));
+  }
+
+  async function handleCheckbox(id: number) {
+    let res = await fetch(`http://localhost:7005/todos/${id}/complete`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      console.error("Request failed");
+    }
+    let data = await res.json();
+    console.log(data);
+    await fetchLists();
   }
 
   async function handleDelete(id: number): Promise<void> {
@@ -39,6 +63,17 @@ function App() {
     }
     let data = await res.json();
     console.log(data);
+    await fetchLists();
+  }
+
+  async function fetchLists() {
+    let res = await fetch("http://localhost:7005");
+    if (!res.ok) {
+      console.error("Request failed");
+    }
+    let data = await res.json();
+    console.log(data);
+    setItemList(data.data);
   }
 
   async function handleClick(): Promise<void> {
@@ -57,11 +92,9 @@ function App() {
     }
 
     let data = await res.json();
-    if (data.status === "success") {
-      setItemList([...itemList, body]);
-    }
 
     setAlertMsg(data.message);
+    await fetchLists();
   }
 
   return (
@@ -80,33 +113,43 @@ function App() {
           label="Title"
           variant="outlined"
           className="titleField"
+          value={title}
           onChange={handleTitleChange}
         />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DateField
             label="Date"
             className="dateField"
+            value={date}
             onChange={(val) => setDate(val)}
           />
         </LocalizationProvider>
-        <Button
-          className="todoBtn px-5 bg-cyan-500"
-          variant="contained"
-          onClick={handleClick}
-        >
-          Add Task
-        </Button>
+        {isEdit ? (
+          <Button className="todoBtn px-5 bg-cyan-500" variant="contained">
+            Update Task
+          </Button>
+        ) : (
+          <Button
+            className="todoBtn px-5 bg-cyan-500"
+            variant="contained"
+            onClick={handleClick}
+          >
+            Add Task
+          </Button>
+        )}
       </div>
       {itemList.length && (
         <ul>
           {itemList.map((item) => (
             <li key={item.id}>
-              <Checkbox checked={item.isChecked} />
+              <Checkbox
+                checked={item.isChecked}
+                onClick={() => handleCheckbox(item.id as number)}
+              />
               Title : {item.title}
               Date : {item.date}
               <Stack direction="row" spacing={2}>
-                {/* <Button onClick={handleEdit(item.id)}>Edit</Button>
-                <Button onClick={handleUpdate(item.id)}>Update</Button> */}
+                <Button onClick={() => handleEdit(item)}>Edit</Button>
                 <Button onClick={() => handleDelete(item.id as number)}>
                   Delete
                 </Button>

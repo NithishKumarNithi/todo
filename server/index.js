@@ -37,13 +37,13 @@ app.get("/", async (req, res) => {
 
 // create new item
 app.post("/todos", async (req, res) => {
-  let { id, title, date, isChecked } = req.body;
+  let { title, date } = req.body;
   itemsId = itemsId + 1;
   items.push({
     id: itemsId,
     title: title,
     date: date,
-    isChecked: isChecked,
+    isChecked: false,
   });
 
   res.status(200).json({
