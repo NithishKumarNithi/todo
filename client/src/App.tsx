@@ -19,7 +19,7 @@ interface Item {
 
 function App() {
   const [title, setTitle] = useState("");
-  const [date, setDate] = useState<Dayjs | null>(dayjs(""));
+  const [date, setDate] = useState<Dayjs | null>(dayjs("04/11/2024"));
   const [alertMsg, setAlertMsg] = useState("");
   const [itemList, setItemList] = useState<Item[]>([]);
   const [isEdit, setIsEdit] = useState<Item | null>(null);
@@ -77,10 +77,31 @@ function App() {
   }
 
   async function handleClick(): Promise<void> {
-    let _date = date?.format("MM/DD/YYYY");
+    let _date = date?.format("DD/MM/YYYY");
     let body = { title: title, date: _date };
     let res = await fetch("http://localhost:7005/todos", {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      console.error("Request failed");
+    }
+
+    let data = await res.json();
+
+    setAlertMsg(data.message);
+    await fetchLists();
+  }
+
+  async function handleUpdate(): Promise<void> {
+    let _date = date?.format("DD/MM/YYYY");
+    let body = { id: isEdit?.id, title: title, date: _date };
+    let res = await fetch("http://localhost:7005/todos", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -120,12 +141,17 @@ function App() {
           <DateField
             label="Date"
             className="dateField"
+            format="DD/MM/YYYY"
             value={date}
             onChange={(val) => setDate(val)}
           />
         </LocalizationProvider>
         {isEdit ? (
-          <Button className="todoBtn px-5 bg-cyan-500" variant="contained">
+          <Button
+            className="todoBtn px-5 bg-cyan-500"
+            variant="contained"
+            onClick={handleUpdate}
+          >
             Update Task
           </Button>
         ) : (
@@ -138,7 +164,7 @@ function App() {
           </Button>
         )}
       </div>
-      {itemList.length && (
+      {itemList.length > 0 && (
         <ul>
           {itemList.map((item) => (
             <li key={item.id}>

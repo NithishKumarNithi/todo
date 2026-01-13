@@ -3,32 +3,13 @@ const app = express();
 const cors = require("cors");
 const PORT = 7005;
 
-let itemsId = 3;
+let itemsId = 0;
 
 // middleware
 app.use(cors());
 app.use(express.json());
 
-let items = [
-  {
-    id: 1,
-    title: "Title One",
-    date: "12/05/2025",
-    isChecked: false,
-  },
-  {
-    id: 2,
-    title: "Title Two",
-    date: "20/06/2025",
-    isChecked: true,
-  },
-  {
-    id: 3,
-    title: "Title Three",
-    date: "30/09/2025",
-    isChecked: false,
-  },
-];
+let items = [];
 
 // test route
 app.get("/", async (req, res) => {
